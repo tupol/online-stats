@@ -61,19 +61,24 @@ object CovarianceOps {
     /** @inheritdoc */
     def append(covar: Covariance[Double], x: Double, y: Double): Covariance[Double] = {
 
-      val n = covar.xstats.count + 1.0
+      if (covar.xstats.count == 0)
+        Covariance.fromDoubles(x, y)
+      else {
+        val n = covar.xstats.count + 1.0
 
-      val xAvg = covar.xstats.avg
-      val yAvg = covar.ystats.avg
+        val xAvg = covar.xstats.avg
+        val yAvg = covar.ystats.avg
 
-      val xstats = covar.xstats |+| x
-      val ystats = covar.ystats |+| y
+        val xstats = covar.xstats |+| x
+        val ystats = covar.ystats |+| y
 
-      val nc = (n - 1) / n
-      val comoment = covar.comoment + nc * (x - xAvg) * (y - yAvg)
-      val covariance = covar.covariance * nc + (x - xAvg) * (y - yAvg) * nc / n
+        val nc = (n - 1) / n
+        val comoment = covar.comoment + nc * (x - xAvg) * (y - yAvg)
+        val covariance = covar.covariance * nc + (x - xAvg) * (y - yAvg) * nc / n
 
-      Covariance(covariance, comoment, xstats, ystats)
+        Covariance(covariance, comoment, xstats, ystats)
+      }
+
     }
 
     /** @inheritdoc */

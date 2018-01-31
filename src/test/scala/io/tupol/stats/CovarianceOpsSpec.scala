@@ -3,7 +3,7 @@ package io.tupol.stats
 import io.tupol.stats.CovarianceOps._
 import io.tupol.utils.DefaultTolerance
 import io.tupol.utils.Tolerance._
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{ FunSuite, Matchers }
 
 import scala.util.Random
 
