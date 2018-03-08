@@ -122,6 +122,5 @@ object DoubleStatsOps extends StatsOps[Double] {
       (1 / sqrt(2 * Pi * variance)) * exp(-pow(x - mean, 2) / (2 * variance))
   }
 
-  override def pdf(s: Stats[Double], x: Double, degenerateSolution: Double): Double = pdf(x, s.avg, s.variance())
+  override def pdf(s: Stats[Double], x: Double, degenerateSolution: Double): Double = pdf(x, s.avg, s.variance(), degenerateSolution)
 }
-

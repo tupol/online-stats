@@ -1,0 +1,35 @@
+\documentclass[12pt]{article}
+\begin{document}
+
+A few formulas expressing the average, online average and exponentially moving average
+
+\\
+\tilde{x}_{n} = \frac{1}{n} \sum_{i=1}^{n}x_{i}
+\\
+\tilde{x}_{n} = \frac{1}{n} \left (  \sum_{i=1}^{n-1}x_{i} + x_{n} \right )
+\\
+\tilde{x}_{n} = \frac{1}{n} \left ( \frac{n-1}{n-1} \sum_{i=1}^{n-1}x_{i} + x_{n} \right )
+\\
+\tilde{x}_{n} = \frac{1}{n} \left ( (n-1) \tilde{x}_{n-1} + x_{n} \right )
+\\
+\tilde{x}_{n} = \frac{n-1}{n}\tilde{x}_{n-1} + \frac{1}{n}x_{n}
+\\
+\tilde{x}_{n} = \left ( 1 - \frac{1}{n} \right )\tilde{x}_{n-1} + \frac{1}{n}x_{n}
+\\
+\alpha = \frac{1}{n}
+\\
+\tilde{x}_{n} = \left ( 1 - \alpha \right )\tilde{x}_{n-1} + \alpha x_{n}
+\\
+\\
+\tilde{x}_{n} \oplus \tilde{x}_{m} = \tilde{x}_{n+m}
+\\
+\tilde{x}_{n+m} = \frac{n\tilde{x}_{n} + m\tilde{x}_{m}}{n+m}
+\\
+\tilde{x}_{n+1} = \frac{n\tilde{x}_{n} + 1 \tilde{x}}{n+1}
+\\
+\tilde{x}_{n+1} = \frac{n\tilde{x}_{n} + x}{n+1}
+\\
+\tilde{x}_{n} = \frac{(n-1)\tilde{x}_{n-1} + x}{n}
+
+
+\end{document}

@@ -13,19 +13,25 @@ Algos covered so far:
   - variance and standard deviation
   - skewness
   - kurtosis
+- exponentially weighted moving averages
 - covariance
+
+Algos to be researched:
+- exponentially weighted moving variance and standard deviation
+- exponentially weighted moving skewness
+- exponentially weighted moving kurtosis
 
 
 ## Complexity
 
-| Feature                      | State Memory Requirements | Complexity |
-| ---------------------------- | :-----------------------: | :--------: |
-| Count, Sum, Min, Max         | 1 * MU                    | 1          |
-| Average                      | 2 * MU                    | 1          |
-| Variance, Standard deviation | 3 * MU                    | 1          |
-| Skewness                     | 4 * MU                    | 1          |
-| Kurtosis                     | 5 * MU                    | 1          |
-| Exponentially moving average | 2 * MU                    | 1          |
+| Feature                      | Space Complexity (*O*) | Time Complexity (*O*) |
+| ---------------------------- | :--------------------: | :-------------------: |
+| Count, Sum, Min, Max         | ***O***(1)  (1 * MU)   | ***O***(1)                |
+| Average                      | ***O***(1)  (2 * MU)   | ***O***(1)                |
+| Variance, Standard deviation | ***O***(1)  (3 * MU)   | ***O***(1)                |
+| Skewness                     | ***O***(1)  (4 * MU)   | ***O***(1)                |
+| Kurtosis                     | ***O***(1)  (5 * MU)   | ***O***(1)                |
+| Exponentially moving average | ***O***(1)  (2 * MU)   | ***O***(1)                |
 
 *MU*: Memory Unit, e.g. Int: 4 bytes, Double 8: bytes
 
@@ -37,4 +43,5 @@ Algos covered so far:
 - [Kurtosis](https://en.wikipedia.org/wiki/Kurtosis)
 - [Pearson's_correlation_coefficient](https://en.wikipedia.org/wiki/Correlation_and_dependence#Pearson's_product-moment_coefficient)
 - ["Formulas for Robust, One-Pass Parallel Computation of Covariances and Arbitrary-Order Statistical Moments" by Philippe Pebay](http://prod.sandia.gov/techlib/access-control.cgi/2008/086212.pdf)
+- ["The Exponentially Weighted Moving Variance" by J. F. Macgregor and T. J. Harris](https://www.tandfonline.com/doi/abs/10.1080/00224065.1993.11979433)
 
