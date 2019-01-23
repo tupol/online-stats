@@ -2,9 +2,7 @@ package org.tupol.stats
 
 import StatsOps._
 
-/**
- * Implicit decorators for Covariance types
- */
+/** Implicit decorators for Covariance types */
 object CovarianceOps {
 
   trait CovarianceOps[T] {
@@ -29,10 +27,7 @@ object CovarianceOps {
     def append(covar: Covariance[T], x: T, y: T): Covariance[T]
   }
 
-  /**
-   * Generic Covariance decorator
-   * @tparam T
-   */
+  /** Generic Covariance decorator */
   trait OnlineCovarianceOps[T] {
     def append(covariance: Covariance[T])(implicit ops: CovarianceOps[T]): Covariance[T]
     def |+|(covariance: Covariance[T])(implicit ops: CovarianceOps[T]): Covariance[T] = append(covariance)
@@ -40,20 +35,15 @@ object CovarianceOps {
     def |+|(x: T, y: T)(implicit ops: CovarianceOps[T]): Covariance[T] = append(x, y)
   }
 
-  /**
-   * Decorator for Covariances of Doubles
-   * @param covariance
-   */
+  /** Decorator for Covariances of Doubles */
   implicit class CovarianceOnlineOps[T](val covariance: Covariance[T]) extends OnlineCovarianceOps[T] {
     override def append(covariance: Covariance[T])(implicit ops: CovarianceOps[T]): Covariance[T] = ops.append(this.covariance, covariance)
     override def append(x: T, y: T)(implicit ops: CovarianceOps[T]): Covariance[T] = ops.append(this.covariance, x, y)
   }
 
   implicit class DoubleCorrelationOps(val stats: Covariance[Double]) {
-    /**
-     * Compute the Pearsons correlation coefficient. See [[https://en.wikipedia.org/wiki/Correlation_and_dependence#Pearson's_product-moment_coefficient]]
-     * @return
-     */
+    /** Compute the Pearsons correlation coefficient.
+     * See [[https://en.wikipedia.org/wiki/Correlation_and_dependence#Pearson's_product-moment_coefficient]] */
     def pearsonCorrelation: Double = stats.comoment / (math.sqrt(stats.xstats.sse * stats.ystats.sse))
   }
 
@@ -80,7 +70,6 @@ object CovarianceOps {
       }
 
     }
-
     /** @inheritdoc */
     def append(covar1: Covariance[Double], covar2: Covariance[Double]): Covariance[Double] = {
 

@@ -1,7 +1,7 @@
-# online-stats
+# online-stats #
 
 
-## Scope
+## Scope ##
 
 Naive implementation of a few online statistical algorithms.
 
@@ -21,7 +21,7 @@ Algos to be researched:
 - exponentially weighted moving kurtosis
 
 
-## Complexity
+## Complexity ##
 
 | Feature                         | Space Complexity (*O*) | Time Complexity (*O*) |
 | ------------------------------- | :--------------------: | :-------------------: |
@@ -35,11 +35,11 @@ Algos to be researched:
 
 *MU*: Memory Unit, e.g. Int: 4 bytes, Double 8: bytes
 
-## Demos and Examples
+## Demos and Examples ##
 
 The [`streaming-anomalies-demos`](https://github.com/tupol/streaming-anomalies-demos) project was created to explore and demonstrate some basic use cases for the `online-stats` library.
 
-## References
+## References ##
 
 - [*"Formulas for Robust, One-Pass Parallel Computation of Covariances and Arbitrary-Order Statistical Moments"* by Philippe Pebay](http://prod.sandia.gov/techlib/access-control.cgi/2008/086212.pdf)
 - [*"The Exponentially Weighted Moving Variance"* by J. F. Macgregor and T. J. Harris](https://www.tandfonline.com/doi/abs/10.1080/00224065.1993.11979433)

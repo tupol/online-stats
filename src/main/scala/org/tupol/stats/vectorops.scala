@@ -1,48 +1,32 @@
 package org.tupol.stats
 
-/**
- * Additional operations for linalg.Vector
- */
+/** Additional operations for linalg.Vector */
 object vectorops {
 
-  /**
-   * Additional operations for Double with DVector
-   */
+  /** Additional operations for Double with DVector */
   implicit class DoubleOps(val scalar: Double) extends AnyVal {
 
-    def +(vector: DVector): DVector = {
+    def +(vector: DVector): DVector =
       opByDim(vector, (x1: Double, x2: Double) => x1 + x2)
-    }
 
-    def *(vector: DVector): DVector = {
+    def *(vector: DVector): DVector =
       opByDim(vector, (x1: Double, x2: Double) => x1 * x2)
-    }
 
-    def -(vector: DVector): DVector = {
+    def -(vector: DVector): DVector =
       opByDim(vector, (x1: Double, x2: Double) => x1 - x2)
-    }
 
-    def /(vector: DVector): DVector = {
+    def /(vector: DVector): DVector =
       opByDim(vector, (x1: Double, x2: Double) => x1 / x2)
-    }
 
-    private[stats] def opByDim(vector: DVector, op: (Double, Double) => Double) =
+    private[stats] def opByDim(vector: DVector, op: (Double, Double) => Double): DVector =
       vector.map { op(scalar, _) }
 
   }
 
-  /**
-   * Added operations by dimension
-   * @param self
-   */
+  /** Added operations by dimension */
   implicit class DVectorOps(val self: DVector) extends AnyVal {
 
-    /**
-     * Squared distances by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Squared distances by dimension */
     def sqdistByDim(that: DVector): DVector = {
       require(self.size == that.size, "vectors should have same size")
       self.zip(that).map {
@@ -50,120 +34,57 @@ object vectorops {
       }
     }
 
-    /**
-     * Add 2 vectors, dimension by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Add 2 vectors, dimension by dimension */
     def +(that: DVector): DVector = {
       require(self.size == that.size)
       op(self, that, (x1: Double, x2: Double) => x1 + x2)
     }
 
-    /**
-     * Add each value in this vector with the provided scalar value
-     *
-     * @param scalar
-     * @return
-     */
-    def +(scalar: Double): DVector = {
+    /** Add each value in this vector with the provided scalar value */
+    def +(scalar: Double): DVector =
       op(self, scalar, (x1: Double, x2: Double) => x1 + x2)
-    }
 
-    /**
-     * Subtract that vector from this vector, dimension by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Subtract that vector from this vector, dimension by dimension */
     def -(that: DVector): DVector = {
       require(self.size == that.size)
       op(self, that, (x1: Double, x2: Double) => x1 - x2)
     }
 
-    /**
-     * Subtract each value in this vector with the provided scalar value
-     *
-     * @param scalar
-     * @return
-     */
+    /** Subtract each value in this vector with the provided scalar value */
     def -(scalar: Double): DVector = {
       op(self, scalar, (x1: Double, x2: Double) => x1 - x2)
     }
 
-    /**
-     * Change the sign of each value inside the vector
-     *
-     * @return
-     */
+    /** Change the sign of each value inside the vector */
     def unary_- : DVector = self.map(-_)
 
-    /**
-     * Calculate the exponential by dimension
-     *
-     * @return
-     */
+    /** Calculate the exponential by dimension */
     def exp: DVector = map(math.exp)
 
-    /**
-     * Calculates the square root by dimension
-     *
-     * @return new vector
-     */
+    /** Calculates the square root by dimension */
     def sqrt: DVector = map(math.sqrt)
 
-    /**
-     * Calculate the square by dimension
-     *
-     * @return
-     */
+    /** Calculate the square by dimension */
     def sqr: DVector = map(x => x * x)
 
-    /**
-     * Calculate the power at exponent by dimension
-     *
-     * @return
-     */
+    /** Calculate the power at exponent by dimension */
     def pow(exponent: Double): DVector = map(x => math.pow(x, exponent))
 
-    /**
-     * Multiply this vector with that vector, dimension by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Multiply this vector with that vector, dimension by dimension */
     def *(that: DVector): DVector = {
       require(self.size == that.size)
       op(self, that, (x1: Double, x2: Double) => x1 * x2)
     }
 
-    /**
-     * Multiply each value in this vector with the provided scalar value
-     *
-     * @param scalar
-     * @return
-     */
-    def *(scalar: Double): DVector = {
+    /** Multiply each value in this vector with the provided scalar value */
+    def *(scalar: Double): DVector =
       op(self, scalar, (x1: Double, x2: Double) => x1 * x2)
-    }
 
-    /**
-     * Divide each value in this vector with the provided scalar value
-     *
-     * @param scalar
-     * @return
-     */
-    def /(scalar: Double): DVector = {
+    /** Divide each value in this vector with the provided scalar value */
+    def /(scalar: Double): DVector =
       op(self, scalar, (x1: Double, x2: Double) => x1 / x2)
-    }
 
-    /**
-     * Divide this vector with that vector, dimension by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Divide this vector with that vector, dimension by dimension */
     def /(that: DVector): DVector = {
       require(self.size == that.size)
       op(self, that, (x1: Double, x2: Double) => x1 / x2)
@@ -181,18 +102,10 @@ object vectorops {
       v1.map(op)
   }
 
-  /**
-   * Added operations by dimension
-   * @param self
-   */
+  /** Added operations by dimension */
   implicit class LVectorOps(val self: LVector) extends AnyVal {
 
-    /**
-     * Squared distances by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Squared distances by dimension */
     def sqdistByDim(that: LVector): LVector = {
       require(self.size == that.size, "vectors should have same size")
       self.zip(that).map {
@@ -200,120 +113,56 @@ object vectorops {
       }
     }
 
-    /**
-     * Add 2 vectors, dimension by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Add each value in this vector with the provided scalar value */
+    def +(scalar: Long): LVector =
+      op(self, scalar, (x1: Long, x2: Long) => x1 + x2)
+
+    /** Add 2 vectors, dimension by dimension */
     def +(that: LVector): LVector = {
       require(self.size == that.size)
       op(self, that, (x1: Long, x2: Long) => x1 + x2)
     }
 
-    /**
-     * Add each value in this vector with the provided scalar value
-     *
-     * @param scalar
-     * @return
-     */
-    def +(scalar: Long): LVector = {
-      op(self, scalar, (x1: Long, x2: Long) => x1 + x2)
-    }
+    /** Subtract each value in this vector with the provided scalar value */
+    def -(scalar: Long): LVector =
+      op(self, scalar, (x1: Long, x2: Long) => x1 - x2)
 
-    /**
-     * Subtract that vector from this vector, dimension by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Subtract that vector from this vector, dimension by dimension */
     def -(that: LVector): LVector = {
       require(self.size == that.size)
       op(self, that, (x1: Long, x2: Long) => x1 - x2)
     }
 
-    /**
-     * Subtract each value in this vector with the provided scalar value
-     *
-     * @param scalar
-     * @return
-     */
-    def -(scalar: Long): LVector = {
-      op(self, scalar, (x1: Long, x2: Long) => x1 - x2)
-    }
-
-    /**
-     * Change the sign of each value inside the vector
-     *
-     * @return
-     */
+    /** Change the sign of each value inside the vector */
     def unary_- : LVector = self.map(-_)
 
-    /**
-     * Calculate the exponential by dimension
-     *
-     * @return
-     */
+    /** Calculate the exponential by dimension */
     def exp: LVector = map(x => math.exp(x.toDouble).toLong)
 
-    /**
-     * Calculates the square root by dimension
-     *
-     * @return new vector
-     */
+    /** Calculates the square root by dimension */
     def sqrt: LVector = map(x => math.sqrt(x.toDouble).toLong)
 
-    /**
-     * Calculate the square by dimension
-     *
-     * @return
-     */
+    /** Calculate the square by dimension */
     def sqr: LVector = map(x => x * x)
 
-    /**
-     * Calculate the power at exponent by dimension
-     *
-     * @return
-     */
+    /** Calculate the power at exponent by dimension */
     def pow(exponent: Double): DVector = map(x => math.pow(x.toDouble, exponent).toLong)
 
-    /**
-     * Multiply this vector with that vector, dimension by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Multiply each value in this vector with the provided scalar value */
+    def *(scalar: Long): LVector =
+      op(self, scalar, (x1: Long, x2: Long) => x1 * x2)
+
+    /** Multiply this vector with that vector, dimension by dimension */
     def *(that: LVector): LVector = {
       require(self.size == that.size)
       op(self, that, (x1: Long, x2: Long) => x1 * x2)
     }
 
-    /**
-     * Multiply each value in this vector with the provided scalar value
-     *
-     * @param scalar
-     * @return
-     */
-    def *(scalar: Long): LVector = {
-      op(self, scalar, (x1: Long, x2: Long) => x1 * x2)
-    }
-
-    /**
-     * Divide each value in this vector with the provided scalar value
-     *
-     * @param scalar
-     * @return
-     */
-    def /(scalar: Long): LVector = {
+    /** Divide each value in this vector with the provided scalar value */
+    def /(scalar: Long): LVector =
       op(self, scalar, (x1: Long, x2: Long) => x1 / x2)
-    }
 
-    /**
-     * Divide this vector with that vector, dimension by dimension
-     *
-     * @param that
-     * @return
-     */
+    /** Divide this vector with that vector, dimension by dimension */
     def /(that: LVector): LVector = {
       require(self.size == that.size)
       op(self, that, (x1: Long, x2: Long) => x1 / x2)

@@ -14,7 +14,7 @@ class DoubleStatsOpsSpec extends FunSuite with Matchers {
   }
 
   test("stats |+| zero = stats") {
-    DoubleStats.fromDoubles(1) |+| DoubleStats.zeroDouble shouldBe DoubleStats.fromDoubles(1)
+    DoubleStats.fromDouble(1) |+| DoubleStats.zeroDouble shouldBe DoubleStats.fromDouble(1)
     DoubleStats.fromDoubles(Seq(1.0, 2, 3)) |+| DoubleStats.zeroDouble shouldBe DoubleStats.fromDoubles(Seq(1.0, 2, 3))
   }
 

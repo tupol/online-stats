@@ -11,9 +11,7 @@ package org.tupol.stats
  */
 case class Covariance[T](covariance: T, comoment: T, xstats: Stats[T], ystats: Stats[T])
 
-/**
- * Covariance companion with Covariance factories
- */
+/** Covariance companion with Covariance factories */
 object Covariance {
 
   /**

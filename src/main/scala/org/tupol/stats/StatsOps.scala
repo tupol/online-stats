@@ -2,7 +2,7 @@ package org.tupol.stats
 
 object StatsOps {
 
-  implicit def double2Stats(value: Double): Stats[Double] = DoubleStats.fromDoubles(value)
+  implicit def double2Stats(value: Double): Stats[Double] = DoubleStats.fromDouble(value)
   implicit def doubles2Stats(value: Iterable[Double]): Stats[Double] = DoubleStats.fromDoubles(value)
   implicit def dVector2Stats(value: DVector): Stats[DVector] = DVectorStats.fromDVector(value)
   implicit def dVectors2Stats(value: Iterable[DVector]): Stats[DVector] = DVectorStats.fromDVectors(value)

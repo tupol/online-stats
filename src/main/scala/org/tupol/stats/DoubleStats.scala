@@ -18,17 +18,22 @@ case class DoubleStats(count: Double, min: Double, max: Double, sum: Double, m2:
 
   import math._
 
+  /** @inheritdoc */
   override def m1 = sum.toDouble / count
 
+  /** @inheritdoc */
   override def variance(biasCorrected: Boolean = false): Double = {
     val correction = if (biasCorrected && count > 1) count.toDouble / (count - 1) else 1.0
     (sse / count) * correction
   }
 
+  /** @inheritdoc */
   override def stdev(biasCorrected: Boolean = false): Double = math.sqrt(variance(biasCorrected))
 
+  /** @inheritdoc */
   override def skewness: Double = if (variance(false) <= 1E-20) 0.0 else sqrt(count.toDouble) * m3 / pow(m2, 1.5)
 
+  /** @inheritdoc */
   override def kurtosis: Double = if (variance(false) <= 1E-20) 0.0 else count * m4 / (m2 * m2) - 3.0
 
 }
@@ -58,12 +63,8 @@ object DoubleStats {
       new DoubleStats(n, population.min, population.max, total, m2, m3, m4)
     }
 
-  /**
-   * Initialises the stats from a single double.
-   * @param value
-   * @return
-   */
-  def fromDoubles(value: Double): Stats[Double] = DoubleStats(1, value, value, value, 0.0, 0.0, 0.0)
+  /** Initialises the stats from a single double. */
+  def fromDouble(value: Double): Stats[Double] = DoubleStats(1, value, value, value, 0.0, 0.0, 0.0)
 
   val zeroDouble: Stats[Double] = DoubleStats(0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
@@ -73,7 +74,7 @@ object DoubleStats {
 
 object DoubleStatsOps extends StatsOps[Double] {
 
-  override def append(x: Stats[Double], value: Double) = append(x, DoubleStats.fromDoubles(value))
+  override def append(x: Stats[Double], value: Double) = append(x, DoubleStats.fromDouble(value))
 
   override def append(x: Stats[Double], y: Stats[Double]): Stats[Double] = {
     if (x.count == 0) y
@@ -95,7 +96,7 @@ object DoubleStatsOps extends StatsOps[Double] {
       val ny2 = ny * ny
       // See https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
       //        val m1 = (nx * x.m1 + ny * y.m1) / n // Moment 1
-      val m1 = total / n.toDouble
+      //        val m1 = total / n.toDouble // Same as above, but less computations
       val m2 = (x.m2 + y.m2) + delta2 * nx * ny / n // Moment 2
       val m3 = (x.m3 + y.m3) +
         1.0 * delta3 * nx * ny * (nx - ny) / n2 +

@@ -50,7 +50,7 @@ class DoubleEWeightedStatsOpsSpec extends FunSuite with Matchers {
     val randomizer = new Random(7773)
     val testData = (0 to 100).map(_ => randomizer.nextDouble() * MaxValue)
 
-    val statsComposed = testData.tail.foldLeft(DoubleEWeightedStats.zeroDouble(alpha, testData.head))((result, input) => result |+| input)
+    val statsComposed = testData.tail.foldLeft(DoubleEWeightedStats.fromDouble(alpha, testData.head))((result, input) => result |+| input)
     val statsFromDoubles = DoubleEWeightedStats.fromDoubles(alpha, testData)
 
     statsComposed.count shouldBe statsFromDoubles.count

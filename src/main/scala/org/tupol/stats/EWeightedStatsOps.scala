@@ -22,7 +22,7 @@ object EWeightedStatsOps {
       val m3 = math.pow(m2, 3 / 2.0)
       val m4 = m2 * m2
 
-      DoubleEWeightedStats(stats.alpha, newMin, newMax, m1, m2, m3, m4)
+      DoubleEWeightedStats(stats.alpha, stats.count + 1, newMin, newMax, m1, m2, m3, m4)
     }
     override def |+|(x: Double) = append(x)
 

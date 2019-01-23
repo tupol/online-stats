@@ -8,7 +8,7 @@ package org.tupol.stats
  */
 trait EWeightedStats[T] extends Stats[T] {
   def alpha: Double
-  def count: Double = 1 / alpha + 1
+  def count: Double
   /** The total sum of all the values */
   def sum: T
   /**
