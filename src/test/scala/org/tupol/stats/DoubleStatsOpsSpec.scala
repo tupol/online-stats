@@ -1,6 +1,6 @@
-package io.tupol.stats
+package org.tupol.stats
 
-import io.tupol.stats.StatsOps._
+import org.tupol.stats.StatsOps._
 import org.apache.commons.math3.stat._
 import org.apache.commons.math3.stat.descriptive.moment.{ Kurtosis, Skewness, StandardDeviation, Variance }
 import org.scalatest.{ FunSuite, Matchers }

@@ -1,7 +1,8 @@
-package io.tupol.stats
+package org.tupol.stats
 
-import io.tupol.stats.StatsOps.StatsOps
-import io.tupol.stats.vectorops._
+import org.tupol.stats
+import org.tupol.stats.StatsOps.StatsOps
+import org.tupol.stats.vectorops._
 
 /**
  * The Stats implementation for doubles
@@ -14,7 +15,7 @@ import io.tupol.stats.vectorops._
  * @param m3 moment 3
  * @param m4 moment 4
  */
-case class DVectorStats(count: Long, min: DVector, max: DVector, sum: DVector, m2: DVector, m3: DVector, m4: DVector) extends Stats[DVector] {
+case class DVectorStats(count: Double, min: DVector, max: DVector, sum: DVector, m2: DVector, m3: DVector, m4: DVector) extends Stats[DVector] {
 
   import math._
 
@@ -84,6 +85,8 @@ object DVectorStats {
 
 object DVectorStatsOps extends StatsOps[DVector] {
 
+  override def append(x: Stats[DVector], value: DVector): Stats[DVector] = append(x, DVectorStats.fromDVector(value))
+
   override def append(x: Stats[DVector], y: Stats[DVector]): Stats[DVector] = {
     if (x.count == 0) y
     else if (y.count == 0) x
@@ -115,7 +118,7 @@ object DVectorStatsOps extends StatsOps[DVector] {
         6.0 * delta2 * (nx2 * y.m2 + ny2 * x.m2) / n2 +
         4.0 * delta1 * (nx * y.m3 - ny * x.m3) / n
 
-      DVectorStats(n.toLong, min, max, total, m2, m3, m4)
+      stats.DVectorStats(n.toLong, min, max, total, m2, m3, m4)
     }
   }
 
@@ -127,10 +130,19 @@ object DVectorStatsOps extends StatsOps[DVector] {
    * @param degenerateSolution Sometimes so it happens that the distribution is flat... what then?
    * @return
    */
-  def pdf(x: DVector, mean: DVector, variance: DVector, degenerateSolution: Double = 1E-9) = {
-    require(x.size == mean.size == variance.size, "All input vectors must have the same size.")
-    x.zip(mean).zip(variance).map { case ((x, mean), variance) => DoubleStatsOps.pdf(x, mean, variance, degenerateSolution) }
+  def pdf(x: DVector, mean: DVector, variance: DVector, degenerateSolution: Double = 1E-9): DVector = {
+    require(x.size == mean.size && x.size == variance.size, "All input vectors must have the same size.")
+    x.zip(mean).zip(variance).map { case ((x, mean), variance) => stats.pdf(x, mean, variance, degenerateSolution) }
   }
 
   override def pdf(s: Stats[DVector], x: DVector, degenerateSolution: Double): DVector = pdf(x, s.avg, s.variance(), degenerateSolution)
+
+  override def probability(s: Stats[DVector], x: DVector, range: DVector, epsilon: DVector, degenerateSolution: Double): DVector =
+    x.zip(s.mean).zip(s.stdev()).zip(range.zip(epsilon)).map {
+      case (((x, mean), sigma), (range, epsilon)) =>
+        stats.probability(x, mean, sigma, range, epsilon, degenerateSolution)
+    }
+
+  override def probabilityNSigma(s: Stats[DVector], x: DVector, epsilon: DVector, nSigma: DVector, degenerateSolution: Double): DVector =
+    probability(s, x, nSigma * s.stdev(), epsilon, degenerateSolution)
 }

@@ -1,4 +1,4 @@
-package io.tupol.utils
+package org.tupol.stats.utils
 
 import scala.language.implicitConversions
 

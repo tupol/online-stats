@@ -1,8 +1,8 @@
-package io.tupol.stats
+package org.tupol.stats
 
-import io.tupol.stats.CovarianceOps._
-import io.tupol.utils.DefaultTolerance
-import io.tupol.utils.Tolerance._
+import org.tupol.stats.CovarianceOps._
+import org.tupol.stats.utils.DefaultTolerance
+import org.tupol.stats.utils.Tolerance._
 import org.scalatest.{ FunSuite, Matchers }
 
 import scala.util.Random

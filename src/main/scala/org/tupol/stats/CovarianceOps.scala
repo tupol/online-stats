@@ -1,6 +1,6 @@
-package io.tupol.stats
+package org.tupol.stats
 
-import io.tupol.stats.StatsOps._
+import StatsOps._
 
 /**
  * Implicit decorators for Covariance types

@@ -1,4 +1,4 @@
-package io.tupol.stats
+package org.tupol.stats
 
 /**
  * Additional operations for linalg.Vector

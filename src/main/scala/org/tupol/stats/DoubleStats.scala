@@ -1,6 +1,7 @@
-package io.tupol.stats
+package org.tupol.stats
 
-import io.tupol.stats.StatsOps.StatsOps
+import org.tupol
+import org.tupol.stats.StatsOps.StatsOps
 
 /**
  * The Stats implementation for doubles
@@ -13,7 +14,7 @@ import io.tupol.stats.StatsOps.StatsOps
  * @param m3 moment 3
  * @param m4 moment 4
  */
-case class DoubleStats(count: Long, min: Double, max: Double, sum: Double, m2: Double, m3: Double, m4: Double) extends Stats[Double] {
+case class DoubleStats(count: Double, min: Double, max: Double, sum: Double, m2: Double, m3: Double, m4: Double) extends Stats[Double] {
 
   import math._
 
@@ -72,6 +73,8 @@ object DoubleStats {
 
 object DoubleStatsOps extends StatsOps[Double] {
 
+  override def append(x: Stats[Double], value: Double) = append(x, DoubleStats.fromDoubles(value))
+
   override def append(x: Stats[Double], y: Stats[Double]): Stats[Double] = {
     if (x.count == 0) y
     else if (y.count == 0) x
@@ -105,22 +108,13 @@ object DoubleStatsOps extends StatsOps[Double] {
       DoubleStats(n.toLong, min, max, total, m2, m3, m4)
     }
   }
+  override def pdf(s: Stats[Double], x: Double, degenerateSolution: Double = 1E-12): Double =
+    tupol.stats.pdf(x, s.avg, s.variance(), degenerateSolution)
 
-  /**
-   * Probability density function
-   * @param x
-   * @param mean
-   * @param variance `sigma ^ 2`
-   * @param degenerateSolution Sometimes so it happens that the distribution is flat... what then?
-   * @return
-   */
-  def pdf(x: Double, mean: Double, variance: Double, degenerateSolution: Double = 1E-9) = {
-    import math._
-    if (variance == 0)
-      if (x == mean) 1.0 else degenerateSolution
-    else
-      (1 / sqrt(2 * Pi * variance)) * exp(-pow(x - mean, 2) / (2 * variance))
-  }
+  override def probability(s: Stats[Double], x: Double, range: Double, epsilon: Double, degenerateSolution: Double = 1E-12): Double =
+    tupol.stats.probability(x, s.mean, s.stdev(), range, epsilon, degenerateSolution)
 
-  override def pdf(s: Stats[Double], x: Double, degenerateSolution: Double): Double = pdf(x, s.avg, s.variance(), degenerateSolution)
+  override def probabilityNSigma(s: Stats[Double], x: Double, epsilon: Double, nSigma: Double = 3, degenerateSolution: Double = 1E-12): Double =
+    probability(s, x, nSigma * s.stdev(), epsilon, degenerateSolution)
+
 }

@@ -1,14 +1,14 @@
-package io.tupol.stats
+package org.tupol.stats
 
 /**
- * Represents statistics data
+ * Represent statistics data interface
  */
 trait Stats[T] {
   /**
    * The number of values in the given set
    * @return
    */
-  def count: Long
+  def count: Double
   /**
    * The minimum value of the given set
    * @return
@@ -24,6 +24,7 @@ trait Stats[T] {
    * @return
    */
   def avg: T = m1
+  def average: T = m1
   def mean: T = m1
   /**
    * The total sum of all the values

@@ -1,4 +1,4 @@
-package io.tupol.stats
+package org.tupol.stats
 
 /**
  * Generic Covariance
