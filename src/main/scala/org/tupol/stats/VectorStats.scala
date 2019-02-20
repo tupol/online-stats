@@ -1,7 +1,6 @@
 package org.tupol.stats
 
 import org.tupol.stats
-import org.tupol.stats.StatsOps.StatsOps
 import org.tupol.stats.vectorops._
 
 /**
@@ -15,25 +14,33 @@ import org.tupol.stats.vectorops._
  * @param m3 moment 3
  * @param m4 moment 4
  */
-case class DVectorStats(count: Double, min: DVector, max: DVector, sum: DVector, m2: DVector, m3: DVector, m4: DVector) extends Stats[DVector] {
+case class VectorStats(count: Double, min: Vector, max: Vector, sum: Vector, m2: Vector, m3: Vector, m4: Vector) {
 
   import math._
 
-  override def m1 = sum / count
+  /** moment 1 */
+  def m1 = sum / count
+  /** * The mean value in the given set */
+  def avg = m1
+  def average = m1
+  def mean = m1
 
-  override def variance(biasCorrected: Boolean = false): DVector = {
+  /** The total sum of all the squared errors. Essentially this is just an alias for the second moment. */
+  def sse = m2
+
+  def variance(biasCorrected: Boolean = false): Vector = {
     val correction = if (biasCorrected && count > 1) count.toDouble / (count - 1) else 1.0
     (sse / count) * correction
   }
 
-  override def stdev(biasCorrected: Boolean = false): DVector = variance(biasCorrected).sqrt
+  def stdev(biasCorrected: Boolean = false): Vector = variance(biasCorrected).sqrt
 
-  override def skewness: DVector = variance(false).zip(m2).zip(m3).map {
+  def skewness: Vector = variance(false).zip(m2).zip(m3).map {
     case ((v, m2), m3) =>
       if (v <= 1E-20) 0.0 else sqrt(count) * m3 / pow(m2, 1.5)
   }
 
-  override def kurtosis: DVector = variance(false).zip(m2).zip(m4).map {
+  def kurtosis: Vector = variance(false).zip(m2).zip(m4).map {
     case ((v, m2), m4) =>
       if (v <= 1E-20) 0.0 else count * m4 / (m2 * m2) - 3.0
   }
@@ -41,7 +48,7 @@ case class DVectorStats(count: Double, min: DVector, max: DVector, sum: DVector,
 }
 
 /** Calculates statistics data */
-object DVectorStats {
+object VectorStats {
 
   /**
    * Calculates statistics data of the [[Iterable]] of Double's
@@ -49,7 +56,7 @@ object DVectorStats {
    * @param population non-empty Iterable[Double]
    * @return [[Stats]]
    */
-  def fromDVectors(population: Iterable[DVector]): Stats[DVector] =
+  def fromDVectors(population: Iterable[Vector]): VectorStats =
     if (population.isEmpty)
       zeroDouble
     else {
@@ -58,13 +65,13 @@ object DVectorStats {
       val max = population.reduce((x, y) => x.zip(y).map(x => math.max(x._1, x._2)))
       val total = population.reduce(_ + _)
       val m1 = total / n.toDouble
-      val sxe: Iterable[(DVector, DVector, DVector)] =
+      val sxe: Iterable[(Vector, Vector, Vector)] =
         population.map { d => val er = (d - m1); val er2 = er * er; val er3 = er * er2; val er4 = er * er3; (er2, er3, er4) }
       val m2 = sxe.map(_._1).reduce(_ + _)
       val m3 = sxe.map(_._2).reduce(_ + _)
       val m4 = sxe.map(_._3).reduce(_ + _)
 
-      new DVectorStats(n, min, max, total, m2, m3, m4)
+      new VectorStats(n, min, max, total, m2, m3, m4)
     }
 
   /**
@@ -72,22 +79,18 @@ object DVectorStats {
    * @param value
    * @return
    */
-  def fromDVector(value: DVector): Stats[DVector] = {
+  def fromDVector(value: Vector): VectorStats = {
     require(!value.isEmpty, "We can not initialize ")
     val zeroes = value.map(_ => 0.0)
-    DVectorStats(1, value, value, value, zeroes, zeroes, zeroes)
+    VectorStats(1, value, value, value, zeroes, zeroes, zeroes)
   }
 
-  val zeroDouble: Stats[DVector] = DVectorStats(0, IndexedSeq[Double](), IndexedSeq[Double](),
+  val zeroDouble: VectorStats = VectorStats(0, IndexedSeq[Double](), IndexedSeq[Double](),
     IndexedSeq[Double](), IndexedSeq[Double](), IndexedSeq[Double](), IndexedSeq[Double]())
 
-}
+  def append(x: VectorStats, value: Vector): VectorStats = append(x, VectorStats.fromDVector(value))
 
-object DVectorStatsOps extends StatsOps[DVector] {
-
-  override def append(x: Stats[DVector], value: DVector): Stats[DVector] = append(x, DVectorStats.fromDVector(value))
-
-  override def append(x: Stats[DVector], y: Stats[DVector]): Stats[DVector] = {
+  def append(x: VectorStats, y: VectorStats): VectorStats = {
     if (x.count == 0) y
     else if (y.count == 0) x
     else {
@@ -107,8 +110,8 @@ object DVectorStatsOps extends StatsOps[DVector] {
       def ny = y.count
       val ny2 = ny * ny
       // See https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
-      //        val m1 = (nx * x.m1 + ny * y.m1) / n // Moment 1
-      val m1 = total / n.toDouble
+      //      val m1 = (nx * x.m1 + ny * y.m1) / n // Moment 1
+      //      val m1 = total / n.toDouble
       val m2 = (x.m2 + y.m2) + delta2 * nx * ny / n // Moment 2
       val m3 = (x.m3 + y.m3) +
         1.0 * delta3 * nx * ny * (nx - ny) / n2 +
@@ -118,7 +121,7 @@ object DVectorStatsOps extends StatsOps[DVector] {
         6.0 * delta2 * (nx2 * y.m2 + ny2 * x.m2) / n2 +
         4.0 * delta1 * (nx * y.m3 - ny * x.m3) / n
 
-      stats.DVectorStats(n.toLong, min, max, total, m2, m3, m4)
+      stats.VectorStats(n.toLong, min, max, total, m2, m3, m4)
     }
   }
 
@@ -130,19 +133,33 @@ object DVectorStatsOps extends StatsOps[DVector] {
    * @param degenerateSolution Sometimes so it happens that the distribution is flat... what then?
    * @return
    */
-  def pdf(x: DVector, mean: DVector, variance: DVector, degenerateSolution: Double = 1E-9): DVector = {
+  def pdf(x: Vector, mean: Vector, variance: Vector, degenerateSolution: Double = 1E-9): Vector = {
     require(x.size == mean.size && x.size == variance.size, "All input vectors must have the same size.")
     x.zip(mean).zip(variance).map { case ((x, mean), variance) => stats.pdf(x, mean, variance, degenerateSolution) }
   }
 
-  override def pdf(s: Stats[DVector], x: DVector, degenerateSolution: Double): DVector = pdf(x, s.avg, s.variance(), degenerateSolution)
+  def pdf(s: VectorStats, x: Vector, degenerateSolution: Double): Vector = pdf(x, s.avg, s.variance(), degenerateSolution)
 
-  override def probability(s: Stats[DVector], x: DVector, range: DVector, epsilon: DVector, degenerateSolution: Double): DVector =
+  def probability(s: VectorStats, x: Vector, range: Vector, epsilon: Vector, degenerateSolution: Double): Vector =
     x.zip(s.mean).zip(s.stdev()).zip(range.zip(epsilon)).map {
       case (((x, mean), sigma), (range, epsilon)) =>
         stats.probability(x, mean, sigma, range, epsilon, degenerateSolution)
     }
 
-  override def probabilityNSigma(s: Stats[DVector], x: DVector, epsilon: DVector, nSigma: DVector, degenerateSolution: Double): DVector =
+  def probabilityNSigma(s: VectorStats, x: Vector, epsilon: Vector, nSigma: Vector, degenerateSolution: Double): Vector =
     probability(s, x, nSigma * s.stdev(), epsilon, degenerateSolution)
+
+  implicit class StatsOps(val stats: VectorStats) {
+
+    def append(that: VectorStats): VectorStats = VectorStats.append(stats, that)
+    def append(that: Vector): VectorStats = VectorStats.append(stats, that)
+    def |+|(that: VectorStats): VectorStats = this.append(that)
+    def |+|(that: Vector): VectorStats = this.append(that)
+    def probability(x: Vector, range: Vector, epsilon: Vector, degenerateSolution: Double): Vector =
+      VectorStats.probability(stats, x, range, epsilon, degenerateSolution)
+    def probabilityNSigma(x: Vector, epsilon: Vector, nSigma: Vector, degenerateSolution: Double): Vector =
+      VectorStats.probabilityNSigma(stats, x, epsilon, nSigma, degenerateSolution)
+
+  }
+
 }

@@ -1,6 +1,5 @@
 package org.tupol.stats
 
-import org.tupol.stats.CovarianceOps._
 import org.tupol.stats.utils.DefaultTolerance
 import org.tupol.stats.utils.Tolerance._
 import org.scalatest.{ FunSuite, Matchers }

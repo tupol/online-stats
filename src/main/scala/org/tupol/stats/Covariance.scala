@@ -7,9 +7,8 @@ package org.tupol.stats
  * @param comoment
  * @param xstats
  * @param ystats
- * @tparam T
  */
-case class Covariance[T](covariance: T, comoment: T, xstats: Stats[T], ystats: Stats[T])
+case class Covariance(covariance: Double, comoment: Double, xstats: Stats, ystats: Stats)
 
 /** Covariance companion with Covariance factories */
 object Covariance {
@@ -21,7 +20,7 @@ object Covariance {
    * @param ys
    * @return
    */
-  def fromDoubles(xs: Seq[Double], ys: Seq[Double]): Covariance[Double] = {
+  def fromDoubles(xs: Seq[Double], ys: Seq[Double]): Covariance = {
 
     assert(xs.size == ys.size, "Can not correlate vectors of different sizes.")
     assert(xs.size > 0, "Can not correlate empty vectors.")
@@ -29,8 +28,8 @@ object Covariance {
     val alignedInputs = xs.zip(ys)
 
     val n = alignedInputs.size
-    val x = DoubleStats.fromDoubles(alignedInputs.map(_._1))
-    val y = DoubleStats.fromDoubles(alignedInputs.map(_._2))
+    val x = Stats.fromDoubles(alignedInputs.map(_._1))
+    val y = Stats.fromDoubles(alignedInputs.map(_._2))
 
     val sumXtimesY = alignedInputs.map { case (a, b) => a * b }.sum
 
@@ -42,8 +41,86 @@ object Covariance {
 
   }
 
-  def fromDoubles(x: Double, y: Double): Covariance[Double] = fromDoubles(Seq(x), Seq(y))
+  def fromDoubles(x: Double, y: Double): Covariance = fromDoubles(Seq(x), Seq(y))
 
-  val zeroDouble: Covariance[Double] = Covariance(0, 0, DoubleStats.zeroDouble, DoubleStats.zeroDouble)
+  val zeroDouble: Covariance = Covariance(0, 0, Stats.zeroDouble, Stats.zeroDouble)
+
+  /**
+   * Append a tuple to the current Covariance to obtain a new covariance
+   * See [[https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online]] for ideas
+   * @param covar
+   * @param x
+   * @param y
+   * @return
+   */
+  def append(covar: Covariance, x: Double, y: Double): Covariance = {
+
+    if (covar.xstats.count == 0)
+      Covariance.fromDoubles(x, y)
+    else {
+      val n = covar.xstats.count + 1.0
+
+      val xAvg = covar.xstats.avg
+      val yAvg = covar.ystats.avg
+
+      val xstats = covar.xstats |+| x
+      val ystats = covar.ystats |+| y
+
+      val nc = (n - 1) / n
+      val comoment = covar.comoment + nc * (x - xAvg) * (y - yAvg)
+      val covariance = covar.covariance * nc + (x - xAvg) * (y - yAvg) * nc / n
+
+      Covariance(covariance, comoment, xstats, ystats)
+    }
+
+  }
+  /**
+   * Compose two covariance instances to obtain a new Covariance
+   * See "Formulas for Robust, One-Pass Parallel Computation of Covariances and Arbitrary-Order Statistical Moments" by Philippe Pebay
+   * ([[http://prod.sandia.gov/techlib/access-control.cgi/2008/086212.pdf]])
+   * @param covar1
+   * @param covar2
+   * @return
+   */
+  def append(covar1: Covariance, covar2: Covariance): Covariance = {
+
+    val xstats = covar1.xstats |+| covar2.xstats
+    val ystats = covar1.ystats |+| covar2.ystats
+
+    val (covariance, comoment) = (covar1.xstats.count, covar2.xstats.count) match {
+      case (0, _) => (covar2.covariance, covar2.comoment)
+      case (_, 0) => (covar1.covariance, covar1.comoment)
+      case _ =>
+        val na = covar1.xstats.count.toDouble
+        val nb = covar2.xstats.count.toDouble
+        val n = na + nb
+
+        val x1avg = covar1.xstats.avg
+        val x2avg = covar2.xstats.avg
+        val y1avg = covar1.ystats.avg
+        val y2avg = covar2.ystats.avg
+
+        val comoment = covar1.comoment + covar2.comoment + na * nb / n * (x1avg - x2avg) * (y1avg - y2avg)
+        //          val covariance = (covar1.covariance + covar1.covariance) + (x1avg - x2avg)*(y1avg - y2avg) *  ((na * nb / (n - 1)))
+        val covariance = comoment / n
+        (covariance, comoment)
+    }
+
+    Covariance(covariance, comoment, xstats, ystats)
+  }
+
+  implicit class CovarianceOps(val covariance: Covariance) {
+
+    def append(that: Covariance): Covariance = Covariance.append(covariance, that)
+    def append(x: Double, y: Double): Covariance = Covariance.append(covariance, x, y)
+    def |+|(that: Covariance): Covariance = this.append(that)
+    def |+|(x: Double, y: Double): Covariance = this.append(x, y)
+
+    /**
+     * Compute the Pearsons correlation coefficient.
+     * See [[https://en.wikipedia.org/wiki/Correlation_and_dependence#Pearson's_product-moment_coefficient]]
+     */
+    def pearsonCorrelation: Double = covariance.comoment / (math.sqrt(covariance.xstats.sse * covariance.ystats.sse))
+  }
 
 }

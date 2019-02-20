@@ -1,11 +1,10 @@
 package org.tupol.stats
 
 import org.scalatest.{ FunSuite, Matchers }
-import org.tupol.stats.EWeightedStatsOps._
 
 import scala.util.Random
 
-class DoubleEWeightedStatsOpsSpec extends FunSuite with Matchers {
+class EWeightedStatsOpsSpec extends FunSuite with Matchers {
 
   val alpha = 0.1
 
@@ -16,8 +15,8 @@ class DoubleEWeightedStatsOpsSpec extends FunSuite with Matchers {
     val expectedAverage = testSeqNumbers.sum / testSeqNumbers.size
     val toleranceDefault = 0.1 * expectedAverage // 0.1%
 
-    DoubleEWeightedStats.fromDoubles(alpha, testSeqNumbers).avg shouldBe expectedAverage +- toleranceDefault
-    DoubleEWeightedStats.fromDoubles(alpha, testSeqNumbers).avg shouldBe expectedAverage +- toleranceDefault
+    EWeightedStats.fromDoubles(alpha, testSeqNumbers).avg shouldBe expectedAverage +- toleranceDefault
+    EWeightedStats.fromDoubles(alpha, testSeqNumbers).avg shouldBe expectedAverage +- toleranceDefault
 
   }
 
@@ -27,8 +26,8 @@ class DoubleEWeightedStatsOpsSpec extends FunSuite with Matchers {
     val expectedAverage = testSeqNumbers.sum / testSeqNumbers.size
     val toleranceDefault = 0.5 * expectedAverage // 0.1%
 
-    DoubleEWeightedStats.fromDoubles(alpha, testSeqNumbers).avg shouldBe expectedAverage +- toleranceDefault
-    DoubleEWeightedStats.fromDoubles(alpha, testSeqNumbers).avg shouldBe expectedAverage +- toleranceDefault
+    EWeightedStats.fromDoubles(alpha, testSeqNumbers).avg shouldBe expectedAverage +- toleranceDefault
+    EWeightedStats.fromDoubles(alpha, testSeqNumbers).avg shouldBe expectedAverage +- toleranceDefault
 
   }
 
@@ -39,8 +38,8 @@ class DoubleEWeightedStatsOpsSpec extends FunSuite with Matchers {
     val expectedAverage = testData.sum / testData.size
     val toleranceDefault = 0.5 * expectedAverage // 0.1%
 
-    DoubleEWeightedStats.fromDoubles(alpha, testData).avg shouldBe toleranceDefault +- toleranceDefault
-    DoubleEWeightedStats.fromDoubles(alpha, testData).avg shouldBe toleranceDefault +- toleranceDefault
+    EWeightedStats.fromDoubles(alpha, testData).avg shouldBe toleranceDefault +- toleranceDefault
+    EWeightedStats.fromDoubles(alpha, testData).avg shouldBe toleranceDefault +- toleranceDefault
 
   }
 
@@ -50,8 +49,8 @@ class DoubleEWeightedStatsOpsSpec extends FunSuite with Matchers {
     val randomizer = new Random(7773)
     val testData = (0 to 100).map(_ => randomizer.nextDouble() * MaxValue)
 
-    val statsComposed = testData.tail.foldLeft(DoubleEWeightedStats.fromDouble(alpha, testData.head))((result, input) => result |+| input)
-    val statsFromDoubles = DoubleEWeightedStats.fromDoubles(alpha, testData)
+    val statsComposed = testData.tail.foldLeft(EWeightedStats.fromDouble(alpha, testData.head))((result, input) => result |+| input)
+    val statsFromDoubles = EWeightedStats.fromDoubles(alpha, testData)
 
     statsComposed.count shouldBe statsFromDoubles.count
     statsComposed.min shouldBe statsFromDoubles.min
