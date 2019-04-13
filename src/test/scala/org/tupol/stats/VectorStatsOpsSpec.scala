@@ -1,5 +1,6 @@
 package org.tupol.stats
 
+import scala.collection.immutable.Seq
 import org.apache.commons.math3.stat._
 import org.apache.commons.math3.stat.descriptive.moment.{ Kurtosis, Skewness, StandardDeviation, Variance }
 import org.scalatest.{ FunSuite, Matchers }
@@ -13,21 +14,21 @@ class VectorStatsOpsSpec extends FunSuite with Matchers {
   }
 
   test("stats |+| zero = stats") {
-    VectorStats.fromDVector(IndexedSeq(1)) |+| VectorStats.zeroDouble shouldBe VectorStats.fromDVector(IndexedSeq(1))
-    VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0), IndexedSeq(3.0))) |+| VectorStats.zeroDouble shouldBe VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0), IndexedSeq(3.0)))
+    VectorStats.fromDVector(Seq(1)) |+| VectorStats.zeroDouble shouldBe VectorStats.fromDVector(Seq(1))
+    VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0), Seq(3.0))) |+| VectorStats.zeroDouble shouldBe VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0), Seq(3.0)))
   }
 
   test("stats1 |+| stats2 = stats2 |+| stats1") {
-    VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0))) |+| VectorStats.fromDVectors(Seq(IndexedSeq(3.0), IndexedSeq(4.0))) shouldBe VectorStats.fromDVectors(Seq(IndexedSeq(3.0), IndexedSeq(4.0))) |+| VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0)))
-    VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0))) |+| VectorStats.fromDVectors(Seq(IndexedSeq(3.0), IndexedSeq(4.0))) shouldBe VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0), IndexedSeq(3.0), IndexedSeq(4.0)))
+    VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0))) |+| VectorStats.fromDVectors(Seq(Seq(3.0), Seq(4.0))) shouldBe VectorStats.fromDVectors(Seq(Seq(3.0), Seq(4.0))) |+| VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0)))
+    VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0))) |+| VectorStats.fromDVectors(Seq(Seq(3.0), Seq(4.0))) shouldBe VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0), Seq(3.0), Seq(4.0)))
 
-    VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0))) |+| VectorStats.fromDVectors(Seq(IndexedSeq(3.0), IndexedSeq(4.0))) shouldBe VectorStats.fromDVectors(Seq(IndexedSeq(3.0), IndexedSeq(4.0))) |+| VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0)))
-    VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0))) |+| VectorStats.fromDVectors(Seq(IndexedSeq(3.0), IndexedSeq(4.0))) shouldBe VectorStats.fromDVectors(Seq(IndexedSeq(1.0), IndexedSeq(2.0), IndexedSeq(3.0), IndexedSeq(4.0)))
+    VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0))) |+| VectorStats.fromDVectors(Seq(Seq(3.0), Seq(4.0))) shouldBe VectorStats.fromDVectors(Seq(Seq(3.0), Seq(4.0))) |+| VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0)))
+    VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0))) |+| VectorStats.fromDVectors(Seq(Seq(3.0), Seq(4.0))) shouldBe VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0), Seq(3.0), Seq(4.0)))
   }
 
   test("variance precision check") {
 
-    val testSeqNormalNumbers = Seq(IndexedSeq(4.0), IndexedSeq(7.0), IndexedSeq(13.0), IndexedSeq(16.0))
+    val testSeqNormalNumbers = Seq(Seq(4.0), Seq(7.0), Seq(13.0), Seq(16.0))
     val testSeqLargeNumbers = testSeqNormalNumbers.map(_.map(_ + 1E+12))
 
     val testSeqSmallNumbers = testSeqNormalNumbers.map(_.map(_ / 1E+12))
@@ -48,7 +49,7 @@ class VectorStatsOpsSpec extends FunSuite with Matchers {
     val toleranceLenient = 1E-2
 
     val randomizer = new Random(7773)
-    val testData: Seq[Vector] = (0 to 100).map(_ => IndexedSeq(randomizer.nextDouble() * 1000))
+    val testData: Seq[Vector] = (0 to 100).map(_ => Seq(randomizer.nextDouble() * 1000))
 
     val statsComposed = testData.foldLeft(VectorStats.zeroDouble)((result, input) => result |+| input)
     val statsFromDoubles = VectorStats.fromDVectors(testData)

@@ -1,7 +1,7 @@
 package org.tupol.stats
 
-import org.tupol.stats.utils.DefaultTolerance
 import org.scalatest.{ FunSuite, Matchers }
+import org.tupol.stats.utils.DefaultTolerance
 
 import scala.util.Random
 

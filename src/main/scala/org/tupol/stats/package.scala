@@ -3,7 +3,7 @@ package org.tupol
 package object stats {
 
   /** Stats package Vector type of Doubles */
-  type Vector = IndexedSeq[Double]
+  type Vector = Seq[Double]
 
   /**
    * Probability density function

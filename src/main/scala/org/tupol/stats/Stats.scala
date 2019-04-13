@@ -1,5 +1,9 @@
 package org.tupol.stats
 
+import org.tupol
+
+import scala.collection.parallel.ParIterable
+
 /**
  * The Stats implementation for doubles
  *
@@ -59,14 +63,16 @@ object Stats {
    * @param population non-empty Iterable[Double]
    * @return [[Stats]]
    */
-  def fromDoubles(population: Iterable[Double]): Stats =
+  def fromDoubles(population: Iterator[Double]): Stats = fromDoubles(population.toIterable)
+  def fromDoubles(population: Iterable[Double]): Stats = fromDoubles(population.toParArray)
+  def fromDoubles(population: ParIterable[Double]): Stats =
     if (population.isEmpty)
       zeroDouble
     else {
       val n = population.size
       val total = population.sum
       val m1 = total / n.toDouble
-      val sxe: Iterable[(Double, Double, Double)] =
+      val sxe: ParIterable[(Double, Double, Double)] =
         population.map { d => val er = (d - m1); val er2 = er * er; val er3 = er * er2; val er4 = er * er3; (er2, er3, er4) }
       val m2 = sxe.map(_._1).sum
       val m3 = sxe.map(_._2).sum
@@ -118,55 +124,20 @@ object Stats {
     }
   }
 
-  /**
-   * Probability density function
-   * @param x
-   * @param mean
-   * @param variance `sigma ^ 2`
-   * @param degenerateSolution sometimes so it happens that the distribution is flat... what then?
-   * @return
-   */
-  def pdf(x: Double, mean: Double, variance: Double, degenerateSolution: Double) = {
-    import math._
-    if (variance == 0)
-      if (x == mean) 1.0 else degenerateSolution
-    else
-      (1 / sqrt(2 * Pi * variance)) * exp(-(x - mean) * (x - mean) / (2 * variance))
-  }
-
-  /**
-   * Compute the probability of a value `x` to be in the interval `[x-range, x+range]`.
-   * @param x the value to compute the probability for
-   * @param mean the average of the population
-   * @param stdev standard deviation
-   * @param range the around the x value for which we compute the probability, e.g. probability( x +- range);
-   *              to get probabilities close to 1, the range should be 3 * stdev
-   * @param epsilon how small should the incremental interval for computing the probability be; it should be
-   *                at least an order of magnitude smaller than the `range`
-   * @param degenerateSolution sometimes so it happens that the distribution is flat... what then?
-   * @return
-   */
-  def probability(x: Double, mean: Double, stdev: Double, range: Double, epsilon: Double,
-    degenerateSolution: Double) = {
-    if (stdev == 0 || x == mean) 1.0
-    else {
-      require(epsilon > 0.0 && epsilon <= range / 10.0, s"epsilon ($epsilon) must be be a number greater than zero (0) " +
-        s"and at least an order of magnitude smaller than the range ($range).")
-      val splits = math.round(range / epsilon).toInt
-      val from = x - range
-      val variance = stdev * stdev
-      epsilon * (0 until 2 * splits).map(s => pdf(from + (0.5 + s) * epsilon, mean, variance, degenerateSolution)).sum
-    }
-  }
-
   def pdf(s: Stats, x: Double, degenerateSolution: Double = 1E-12): Double =
-    pdf(x, s.avg, s.variance(), degenerateSolution)
+    tupol.stats.pdf(x, s.avg, s.variance(), degenerateSolution)
 
-  def probability(s: Stats, x: Double, range: Double, epsilon: Double, degenerateSolution: Double = 1E-12): Double =
-    probability(x, s.mean, s.stdev(), range, epsilon, degenerateSolution)
+  def probability(s: Stats, x: Double, range: Double, epsilon: Double, degenerateSolution: Double): Double =
+    tupol.stats.probability(x, s.mean, s.stdev(), range, epsilon, degenerateSolution)
 
-  def probabilityNSigma(s: Stats, x: Double, epsilon: Double, nSigma: Double = 3, degenerateSolution: Double = 1E-12): Double =
+  def probability(s: Stats, x: Double, range: Double, splits: Int = 10, degenerateSolution: Double = 1E-12): Double =
+    probability(s, x, range, range / splits, degenerateSolution)
+
+  def probabilityNSigma(s: Stats, x: Double, epsilon: Double, nSigma: Double, degenerateSolution: Double): Double =
     probability(s, x, nSigma * s.stdev(), epsilon, degenerateSolution)
+
+  def probabilityNSigma(s: Stats, x: Double, splits: Int = 10, nSigma: Double = 3, degenerateSolution: Double = 1E-12): Double =
+    probability(s, x, nSigma * s.stdev(), nSigma * s.stdev() / splits, degenerateSolution)
 
   implicit class StatsOps(val stats: Stats) {
 
@@ -174,10 +145,14 @@ object Stats {
     def append(that: Double): Stats = Stats.append(stats, that)
     def |+|(that: Stats): Stats = this.append(that)
     def |+|(that: Double): Stats = this.append(that)
-    def probability(x: Double, range: Double, epsilon: Double, degenerateSolution: Double = 1E-12): Double =
+    def probability(x: Double, range: Double, epsilon: Double, degenerateSolution: Double): Double =
       Stats.probability(stats, x, range, epsilon, degenerateSolution)
-    def probabilityNSigma(x: Double, epsilon: Double, nSigma: Double, degenerateSolution: Double = 1E-12): Double =
+    def probability(x: Double, range: Double, splits: Int = 10, degenerateSolution: Double = 1E-12): Double =
+      Stats.probability(stats, x, range, splits, degenerateSolution)
+    def probabilityNSigma(x: Double, epsilon: Double, nSigma: Double, degenerateSolution: Double): Double =
       Stats.probabilityNSigma(stats, x, epsilon, nSigma, degenerateSolution)
+    def probabilityNSigma(x: Double, splits: Int = 10, nSigma: Double = 3, degenerateSolution: Double = 1E-12): Double =
+      Stats.probabilityNSigma(stats, x, splits, nSigma, degenerateSolution)
 
   }
 

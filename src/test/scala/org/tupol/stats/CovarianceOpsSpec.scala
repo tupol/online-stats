@@ -1,8 +1,8 @@
 package org.tupol.stats
 
+import org.scalatest.{ FunSuite, Matchers }
 import org.tupol.stats.utils.DefaultTolerance
 import org.tupol.stats.utils.Tolerance._
-import org.scalatest.{ FunSuite, Matchers }
 
 import scala.util.Random
 
@@ -94,7 +94,7 @@ class CovarianceOpsSpec extends FunSuite with Matchers with DefaultTolerance {
     val pcc = new org.apache.commons.math3.stat.correlation.PearsonsCorrelation()
 
     Covariance.fromDoubles(seq1, seq2).pearsonCorrelation shouldBe -1.0 +- tolerance.epsilon
-    Covariance.fromDoubles(seq1, seq2).pearsonCorrelation shouldBe pcc.correlation(seq1.toArray, seq2.toArray)
+    Covariance.fromDoubles(seq1, seq2).pearsonCorrelation shouldBe pcc.correlation(seq1.toArray, seq2.toArray) +- tolerance.epsilon
   }
 
   test("Pearsons Correlation Coefficient tested against a reference implementation") {

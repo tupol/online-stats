@@ -1,7 +1,10 @@
 package org.tupol.stats
 
+import scala.collection.immutable.Seq
 import org.tupol.stats
 import org.tupol.stats.vectorops._
+
+import scala.collection.parallel.ParIterable
 
 /**
  * The Stats implementation for doubles
@@ -56,7 +59,9 @@ object VectorStats {
    * @param population non-empty Iterable[Double]
    * @return [[Stats]]
    */
-  def fromDVectors(population: Iterable[Vector]): VectorStats =
+  def fromDVectors(population: Iterator[Vector]): VectorStats = fromDVectors(population.toParArray)
+  def fromDVectors(population: Iterable[Vector]): VectorStats = fromDVectors(population.toParArray)
+  def fromDVectors(population: ParIterable[Vector]): VectorStats =
     if (population.isEmpty)
       zeroDouble
     else {
@@ -65,7 +70,7 @@ object VectorStats {
       val max = population.reduce((x, y) => x.zip(y).map(x => math.max(x._1, x._2)))
       val total = population.reduce(_ + _)
       val m1 = total / n.toDouble
-      val sxe: Iterable[(Vector, Vector, Vector)] =
+      val sxe: ParIterable[(Vector, Vector, Vector)] =
         population.map { d => val er = (d - m1); val er2 = er * er; val er3 = er * er2; val er4 = er * er3; (er2, er3, er4) }
       val m2 = sxe.map(_._1).reduce(_ + _)
       val m3 = sxe.map(_._2).reduce(_ + _)
@@ -85,8 +90,8 @@ object VectorStats {
     VectorStats(1, value, value, value, zeroes, zeroes, zeroes)
   }
 
-  val zeroDouble: VectorStats = VectorStats(0, IndexedSeq[Double](), IndexedSeq[Double](),
-    IndexedSeq[Double](), IndexedSeq[Double](), IndexedSeq[Double](), IndexedSeq[Double]())
+  val zeroDouble: VectorStats = VectorStats(0, Seq[Double](), Seq[Double](),
+    Seq[Double](), Seq[Double](), Seq[Double](), Seq[Double]())
 
   def append(x: VectorStats, value: Vector): VectorStats = append(x, VectorStats.fromDVector(value))
 
