@@ -1,5 +1,10 @@
 # online-stats #
 
+[![Maven Central](https://img.shields.io/maven-central/v/org.tupol/online-stats_2.11.svg)](https://mvnrepository.com/artifact/org.tupol/online-stats) &nbsp;
+[![GitHub](https://img.shields.io/github/license/tupol/online-stats.svg)](https://github.com/tupol/online-stats/blob/master/LICENSE) &nbsp; 
+[![Travis (.org)](https://img.shields.io/travis/tupol/online-stats.svg)](https://travis-ci.com/tupol/online-stats) &nbsp; 
+[![Codecov](https://img.shields.io/codecov/c/github/tupol/online-stats.svg)](https://codecov.io/gh/tupol/online-stats) &nbsp;
+[![Gitter](https://badges.gitter.im/online-stats/community.svg)](https://gitter.im/online-stats/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) &nbsp; 
 
 ## Scope ##
 
