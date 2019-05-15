@@ -54,9 +54,12 @@ class StatsOpsSpec extends FunSuite with Matchers {
     val statsFromDoubles = Stats.fromDoubles(testData)
 
     statsComposed.count shouldBe statsFromDoubles.count
+    statsComposed.sum shouldBe testData.sum +- toleranceDefault
     statsComposed.min shouldBe statsFromDoubles.min
     statsComposed.max shouldBe statsFromDoubles.max
     statsComposed.avg shouldBe statsFromDoubles.avg +- toleranceDefault
+    statsComposed.average shouldBe statsComposed.avg
+    statsComposed.mean shouldBe statsComposed.avg
     statsComposed.variance() shouldBe statsFromDoubles.variance() +- toleranceDefault
     statsComposed.skewness shouldBe statsFromDoubles.skewness +- toleranceDefault
     statsComposed.kurtosis shouldBe statsFromDoubles.kurtosis +- toleranceDefault

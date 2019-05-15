@@ -1,3 +1,26 @@
+/*
+MIT License
+
+Copyright (c) 2018 Tupol (github.com/tupol)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 package org.tupol.stats
 
 /**
@@ -5,20 +28,22 @@ package org.tupol.stats
  *
  * `exponentially weighted average = (1 - alpha) * previous_ewma + alpha * current_value`
  *
- * @param alpha
+ * @param alpha the importance of the latest readings vs the importance of history (history weight: 1 - alpha)
  * @param count the number of values in the given set
  * @param min the minimum value of the given set
  * @param max the maximum value of the given set
- * @param m1 moment 1
- * @param m2 moment 2
- * @param m3 moment 3
- * @param m4 moment 4
+ * @param m1 moment 1; average
+ * @param m2 moment 2; sum of squared errors
+ * @param m3 moment 3; sum of cubed errors
+ * @param m4 moment 4; sum of quartic errors
  */
 case class EWeightedStats(alpha: Double, count: Double, min: Double, max: Double,
   m1: Double, m2: Double, m3: Double, m4: Double) {
 
   import math._
 
+  /** Sum of all elements  */
+  def sum = m1 * count
   /** * The mean value in the given set */
   def avg: Double = m1
   def average: Double = m1
@@ -42,9 +67,6 @@ case class EWeightedStats(alpha: Double, count: Double, min: Double, max: Double
   def skewness: Double = if (variance(false) <= 1E-20) 0.0 else sqrt(count) * m3 / pow(m2, 1.5)
   /** Kurtosis. See [[https://en.wikipedia.org/wiki/Kurtosis]] */
   def kurtosis: Double = if (variance(false) <= 1E-20) 0.0 else count * m4 / (m2 * m2) - 3.0
-
-  /** @inheritdoc */
-  def sum: Double = count * avg
 
 }
 

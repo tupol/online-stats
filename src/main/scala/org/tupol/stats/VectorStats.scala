@@ -1,3 +1,26 @@
+/*
+MIT License
+
+Copyright (c) 2018 Tupol (github.com/tupol)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 package org.tupol.stats
 
 import scala.collection.immutable.Seq
@@ -12,17 +35,17 @@ import scala.collection.parallel.ParIterable
  * @param count the number of values in the given set
  * @param min the minimum value of the given set
  * @param max the maximum value of the given set
- * @param sum sum of all elements
- * @param m2 moment 2
- * @param m3 moment 3
- * @param m4 moment 4
+ * @param m1 moment 1; average
+ * @param m2 moment 2; sum of squared errors
+ * @param m3 moment 3; sum of cubed errors
+ * @param m4 moment 4; sum of quartic errors
  */
-case class VectorStats(count: Double, min: Vector, max: Vector, sum: Vector, m2: Vector, m3: Vector, m4: Vector) {
+case class VectorStats(count: Double, min: Vector, max: Vector, m1: Vector, m2: Vector, m3: Vector, m4: Vector) {
 
   import math._
 
-  /** moment 1 */
-  def m1 = sum / count
+  /** Sum of all elements  */
+  def sum = m1 * count
   /** * The mean value in the given set */
   def avg = m1
   def average = m1
@@ -31,18 +54,30 @@ case class VectorStats(count: Double, min: Vector, max: Vector, sum: Vector, m2:
   /** The total sum of all the squared errors. Essentially this is just an alias for the second moment. */
   def sse = m2
 
+  /**
+   * Variance. See [[https://en.wikipedia.org/wiki/Variance]]
+   * @param biasCorrected Should the Bessel correction be applied? See also [[https://en.wikipedia.org/wiki/Bessel%27s_correction]]
+   * @return
+   */
   def variance(biasCorrected: Boolean = false): Vector = {
     val correction = if (biasCorrected && count > 1) count.toDouble / (count - 1) else 1.0
     (sse / count) * correction
   }
 
+  /**
+   * Standard deviation. See [[https://en.wikipedia.org/wiki/Variance]]
+   * @param biasCorrected Should the Bessel correction be applied? See also [[https://en.wikipedia.org/wiki/Bessel%27s_correction]]
+   * @return
+   */
   def stdev(biasCorrected: Boolean = false): Vector = variance(biasCorrected).sqrt
 
+  /** Skewness. See [[https://en.wikipedia.org/wiki/Skewness]] */
   def skewness: Vector = variance(false).zip(m2).zip(m3).map {
     case ((v, m2), m3) =>
       if (v <= 1E-20) 0.0 else sqrt(count) * m3 / pow(m2, 1.5)
   }
 
+  /** Kurtosis. See [[https://en.wikipedia.org/wiki/Kurtosis]] */
   def kurtosis: Vector = variance(false).zip(m2).zip(m4).map {
     case ((v, m2), m4) =>
       if (v <= 1E-20) 0.0 else count * m4 / (m2 * m2) - 3.0
@@ -76,7 +111,7 @@ object VectorStats {
       val m3 = sxe.map(_._2).reduce(_ + _)
       val m4 = sxe.map(_._3).reduce(_ + _)
 
-      new VectorStats(n, min, max, total, m2, m3, m4)
+      new VectorStats(n, min, max, m1, m2, m3, m4)
     }
 
   /**
@@ -101,7 +136,6 @@ object VectorStats {
     else {
       require(x.avg.size == y.avg.size, "The size of the vectors we are composing must be the same.")
       val n = (x.count + y.count).toDouble
-      val total = x.sum + y.sum
       val min = x.min.zip(y.min).map(x => math.min(x._1, x._2))
       val max = x.max.zip(y.max).map(x => math.max(x._1, x._2))
       val delta1 = y.avg - x.avg
@@ -115,8 +149,7 @@ object VectorStats {
       def ny = y.count
       val ny2 = ny * ny
       // See https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
-      //      val m1 = (nx * x.m1 + ny * y.m1) / n // Moment 1
-      //      val m1 = total / n.toDouble
+      val m1 = (nx * x.m1 + ny * y.m1) / n // Moment 1
       val m2 = (x.m2 + y.m2) + delta2 * nx * ny / n // Moment 2
       val m3 = (x.m3 + y.m3) +
         1.0 * delta3 * nx * ny * (nx - ny) / n2 +
@@ -126,7 +159,7 @@ object VectorStats {
         6.0 * delta2 * (nx2 * y.m2 + ny2 * x.m2) / n2 +
         4.0 * delta1 * (nx * y.m3 - ny * x.m3) / n
 
-      stats.VectorStats(n.toLong, min, max, total, m2, m3, m4)
+      stats.VectorStats(n.toLong, min, max, m1, m2, m3, m4)
     }
   }
 

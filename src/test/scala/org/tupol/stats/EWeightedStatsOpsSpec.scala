@@ -56,6 +56,8 @@ class EWeightedStatsOpsSpec extends FunSuite with Matchers {
     statsComposed.min shouldBe statsFromDoubles.min
     statsComposed.max shouldBe statsFromDoubles.max
     statsComposed.avg shouldBe statsFromDoubles.avg
+    statsComposed.average shouldBe statsFromDoubles.avg
+    statsComposed.mean shouldBe statsFromDoubles.avg
     statsComposed.variance() shouldBe statsFromDoubles.variance()
     statsComposed.skewness shouldBe statsFromDoubles.skewness
     statsComposed.kurtosis shouldBe statsFromDoubles.kurtosis

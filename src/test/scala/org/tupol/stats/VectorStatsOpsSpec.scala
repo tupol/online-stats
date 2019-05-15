@@ -58,6 +58,8 @@ class VectorStatsOpsSpec extends FunSuite with Matchers {
     statsComposed.min shouldBe statsFromDoubles.min
     statsComposed.max shouldBe statsFromDoubles.max
     statsComposed.avg.head shouldBe statsFromDoubles.avg.head +- toleranceDefault
+    statsComposed.average.head shouldBe statsComposed.avg.head
+    statsComposed.mean.head shouldBe statsComposed.avg.head
     statsComposed.variance().head shouldBe statsFromDoubles.variance().head +- toleranceDefault
     statsComposed.skewness.head shouldBe statsFromDoubles.skewness.head +- toleranceDefault
     statsComposed.kurtosis.head shouldBe statsFromDoubles.kurtosis.head +- toleranceDefault

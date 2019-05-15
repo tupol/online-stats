@@ -4,7 +4,9 @@
 [![GitHub](https://img.shields.io/github/license/tupol/online-stats.svg)](https://github.com/tupol/online-stats/blob/master/LICENSE) &nbsp; 
 [![Travis (.org)](https://img.shields.io/travis/tupol/online-stats.svg)](https://travis-ci.com/tupol/online-stats) &nbsp; 
 [![Codecov](https://img.shields.io/codecov/c/github/tupol/online-stats.svg)](https://codecov.io/gh/tupol/online-stats) &nbsp;
+[![Javadocs](https://www.javadoc.io/badge/org.tupol/online-stats_2.11.svg)](https://www.javadoc.io/doc/org.tupol/online-stats_2.11) &nbsp;
 [![Gitter](https://badges.gitter.im/online-stats/community.svg)](https://gitter.im/online-stats/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) &nbsp; 
+[![Twitter](https://img.shields.io/twitter/url/https/_tupol.svg?color=%2317A2F2)](https://twitter.com/_tupol) &nbsp; 
 
 ## Scope ##
 
@@ -18,12 +20,43 @@ Algos covered so far:
   - variance and standard deviation
   - skewness
   - kurtosis
-- exponentially weighted moving averages and variance
 - covariance
+- exponentially weighted moving averages and variance
 
 Algos to be researched:
 - exponentially weighted moving skewness
 - exponentially weighted moving kurtosis
+
+Using a more formal and mature library like **[Apache Commons Math](http://commons.apache.org/proper/commons-math/)** 
+is probably a better idea for production applications, but this is also tested against it. 
+
+## Description ##
+
+The main concepts introduced in this library are the `Stats`, `EWeightedStats` (exponentially
+weighted stats), `VectorStats` and `Covariance`. Each of them can be composed using either the
+`append` or the `|+|` functions. 
+
+For example, if we have a sequence of numbers, we can compute the statistics like this:
+
+```scala
+  val xs1 = Seq(1.0, 3.0)
+  val stats1: Stats = xs1.foldLeft(Stats.zeroDouble)((s, x) => s |+| x)
+  val xs2 = Seq(5.0, 7.0)
+  val stats2: Stats = xs2.foldLeft(Stats.zeroDouble)((s, x) => s |+| x)
+  val totalStats = stats1 |+| stats2
+  val newStats = totalStats |+| 4.0
+```
+
+The `Stats` type with the `|+|` operation also form a *monoid*, since `|+|` has an *identity* 
+(unit) element, `Stats.zeroDouble`, and it is *associative*. 
+ 
+Also the `|+|` operation is also *commutative*, which makes appealing for distributed computing 
+as well.
+ 
+Same goes for `VectorStats` and `Covariance`.
+
+`EWeightedStats` is an exception for now, as two `EWeightedStats` instances can not be composed.
+However, the `|+|` works between an `EWeightedStats` instance and a double. 
 
 
 ## Complexity ##

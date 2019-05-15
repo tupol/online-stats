@@ -12,6 +12,7 @@ crossScalaVersions := Seq("2.11.12", "2.12.6")
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+  "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
   "org.apache.commons" % "commons-math3" % "3.2" % "test"
 )
 
