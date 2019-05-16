@@ -40,15 +40,15 @@ For example, if we have a sequence of numbers, we can compute the statistics lik
 
 ```scala
   val xs1 = Seq(1.0, 3.0)
-  val stats1: Stats = xs1.foldLeft(Stats.zeroDouble)((s, x) => s |+| x)
+  val stats1: Stats = xs1.foldLeft(Stats.Nil)((s, x) => s |+| x)
   val xs2 = Seq(5.0, 7.0)
-  val stats2: Stats = xs2.foldLeft(Stats.zeroDouble)((s, x) => s |+| x)
+  val stats2: Stats = xs2.foldLeft(Stats.Nil)((s, x) => s |+| x)
   val totalStats = stats1 |+| stats2
   val newStats = totalStats |+| 4.0
 ```
 
 The `Stats` type with the `|+|` operation also form a *monoid*, since `|+|` has an *identity* 
-(unit) element, `Stats.zeroDouble`, and it is *associative*. 
+(unit) element, `Stats.Nil`, and it is *associative*. 
  
 Also the `|+|` operation is also *commutative*, which makes appealing for distributed computing 
 as well.
@@ -85,4 +85,4 @@ The [`streaming-anomalies-demos`](https://github.com/tupol/streaming-anomalies-d
 - [Bessel Correction](https://en.wikipedia.org/wiki/Bessel%27s_correction)
 - [Skewness](https://en.wikipedia.org/wiki/Skewness)
 - [Kurtosis](https://en.wikipedia.org/wiki/Kurtosis)
-- [Pearson's_correlation_coefficient](https://en.wikipedia.org/wiki/Correlation_and_dependence#Pearson's_product-moment_coefficient)
+- [Pearson's Correlation Coefficient](https://en.wikipedia.org/wiki/Correlation_and_dependence#Pearson's_product-moment_coefficient)

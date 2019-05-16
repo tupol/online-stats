@@ -10,7 +10,7 @@ class CovarianceOpsSpec extends FunSuite with Matchers with DefaultTolerance {
 
   test("Zero + doubles: Covariance.zeroDouble |+| (x, y)") {
 
-    val result = Covariance.zeroDouble |+| (1, 2)
+    val result = Covariance.Nil |+| (1, 2)
 
     result shouldBe Covariance.fromDoubles(1, 2)
   }
@@ -18,7 +18,7 @@ class CovarianceOpsSpec extends FunSuite with Matchers with DefaultTolerance {
   test("Update with doubles: covar1 |+| (x, y)") {
 
     val seq = (0 to 100).map(_ => Random.nextDouble())
-    val result = seq.foldLeft(Covariance.zeroDouble)((acc, s) => acc |+| (s, s))
+    val result = seq.foldLeft(Covariance.Nil)((acc, s) => acc |+| (s, s))
     val expected = Covariance.fromDoubles(seq, seq).covariance
     result.covariance shouldBe expected +- tolerance.epsilon
   }
@@ -28,7 +28,7 @@ class CovarianceOpsSpec extends FunSuite with Matchers with DefaultTolerance {
     val seq1 = (0 to 100).map(_ => Random.nextDouble())
     val seq2 = (0 to 100).map(_ => Random.nextDouble())
 
-    val result = seq1.zip(seq2).foldLeft(Covariance.zeroDouble)((acc, s) => acc |+| (s._1, s._2))
+    val result = seq1.zip(seq2).foldLeft(Covariance.Nil)((acc, s) => acc |+| (s._1, s._2))
     val expected = Covariance.fromDoubles(seq1, seq2).covariance
     result.covariance shouldBe expected +- tolerance.epsilon
   }
@@ -39,8 +39,8 @@ class CovarianceOpsSpec extends FunSuite with Matchers with DefaultTolerance {
     val seq2 = (0 to 100).map(_ => Random.nextDouble())
 
     val covar = Covariance.fromDoubles(seq1, seq2)
-    val result1 = Covariance.zeroDouble |+| covar
-    val result2 = covar |+| Covariance.zeroDouble
+    val result1 = Covariance.Nil |+| covar
+    val result2 = covar |+| Covariance.Nil
 
     result1 shouldBe covar
     result2 shouldBe covar

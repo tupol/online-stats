@@ -64,6 +64,10 @@ case class VectorStats(count: Double, min: Vector, max: Vector, m1: Vector, m2: 
     (sse / count) * correction
   }
 
+  /** Variance without bias correction */
+  lazy val variance: Vector = variance(false)
+  /** Variance with bias correction */
+  lazy val varianceBC: Vector = variance(true)
   /**
    * Standard deviation. See [[https://en.wikipedia.org/wiki/Variance]]
    * @param biasCorrected Should the Bessel correction be applied? See also [[https://en.wikipedia.org/wiki/Bessel%27s_correction]]
@@ -71,14 +75,19 @@ case class VectorStats(count: Double, min: Vector, max: Vector, m1: Vector, m2: 
    */
   def stdev(biasCorrected: Boolean = false): Vector = variance(biasCorrected).sqrt
 
+  /** Standard deviation without bias correction */
+  lazy val stdev: Vector = stdev(false)
+  /** Standard deviation with bias correction */
+  lazy val stdevBC: Vector = stdev(true)
+
   /** Skewness. See [[https://en.wikipedia.org/wiki/Skewness]] */
-  def skewness: Vector = variance(false).zip(m2).zip(m3).map {
+  def skewness: Vector = variance.zip(m2).zip(m3).map {
     case ((v, m2), m3) =>
       if (v <= 1E-20) 0.0 else sqrt(count) * m3 / pow(m2, 1.5)
   }
 
   /** Kurtosis. See [[https://en.wikipedia.org/wiki/Kurtosis]] */
-  def kurtosis: Vector = variance(false).zip(m2).zip(m4).map {
+  def kurtosis: Vector = variance.zip(m2).zip(m4).map {
     case ((v, m2), m4) =>
       if (v <= 1E-20) 0.0 else count * m4 / (m2 * m2) - 3.0
   }
@@ -98,7 +107,7 @@ object VectorStats {
   def fromDVectors(population: Iterable[Vector]): VectorStats = fromDVectors(population.toParArray)
   def fromDVectors(population: ParIterable[Vector]): VectorStats =
     if (population.isEmpty)
-      zeroDouble
+      Nil
     else {
       val n = population.size
       val min = population.reduce((x, y) => x.zip(y).map(x => math.min(x._1, x._2)))
@@ -125,7 +134,7 @@ object VectorStats {
     VectorStats(1, value, value, value, zeroes, zeroes, zeroes)
   }
 
-  val zeroDouble: VectorStats = VectorStats(0, Seq[Double](), Seq[Double](),
+  val Nil: VectorStats = VectorStats(0, Seq[Double](), Seq[Double](),
     Seq[Double](), Seq[Double](), Seq[Double](), Seq[Double]())
 
   def append(x: VectorStats, value: Vector): VectorStats = append(x, VectorStats.fromDVector(value))
@@ -171,17 +180,23 @@ object VectorStats {
    * @param degenerateSolution Sometimes so it happens that the distribution is flat... what then?
    * @return
    */
-  def pdf(x: Vector, mean: Vector, variance: Vector, degenerateSolution: Double = 1E-9): Vector = {
-    require(x.size == mean.size && x.size == variance.size, "All input vectors must have the same size.")
-    x.zip(mean).zip(variance).map { case ((x, mean), variance) => stats.pdf(x, mean, variance, degenerateSolution) }
+  def pdf(x: Vector, mean: Vector, stdev: Vector, variance: Vector, degenerateSolution: Double = 1E-9): Vector = {
+    require(
+      x.size == mean.size && x.size == stdev.size && x.size == variance.size,
+      "All input vectors must have the same size.")
+    x.zip(mean).zip(stdev).zip(variance).map {
+      case (((x, mean), stdev), variance) =>
+        stats.pdf(x, mean, stdev, variance, degenerateSolution)
+    }
   }
 
-  def pdf(s: VectorStats, x: Vector, degenerateSolution: Double): Vector = pdf(x, s.avg, s.variance(), degenerateSolution)
+  def pdf(s: VectorStats, x: Vector, degenerateSolution: Double): Vector =
+    pdf(x, s.avg, s.stdev, s.variance, degenerateSolution)
 
   def probability(s: VectorStats, x: Vector, range: Vector, epsilon: Vector, degenerateSolution: Double): Vector =
-    x.zip(s.mean).zip(s.stdev()).zip(range.zip(epsilon)).map {
-      case (((x, mean), sigma), (range, epsilon)) =>
-        stats.probability(x, mean, sigma, range, epsilon, degenerateSolution)
+    x.zip(s.mean).zip(s.stdev).zip(s.variance).zip(range.zip(epsilon)).map {
+      case ((((x, mean), sigma), variance), (range, epsilon)) =>
+        stats.probability(x, mean, sigma, variance, range, epsilon, degenerateSolution)
     }
 
   def probabilityNSigma(s: VectorStats, x: Vector, epsilon: Vector, nSigma: Vector, degenerateSolution: Double): Vector =

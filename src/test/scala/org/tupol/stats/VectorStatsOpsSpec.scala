@@ -10,12 +10,12 @@ import scala.util.Random
 class VectorStatsOpsSpec extends FunSuite with Matchers {
 
   test("zero |+| zero = zero") {
-    VectorStats.zeroDouble |+| VectorStats.zeroDouble shouldBe VectorStats.zeroDouble
+    VectorStats.Nil |+| VectorStats.Nil shouldBe VectorStats.Nil
   }
 
   test("stats |+| zero = stats") {
-    VectorStats.fromDVector(Seq(1)) |+| VectorStats.zeroDouble shouldBe VectorStats.fromDVector(Seq(1))
-    VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0), Seq(3.0))) |+| VectorStats.zeroDouble shouldBe VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0), Seq(3.0)))
+    VectorStats.fromDVector(Seq(1)) |+| VectorStats.Nil shouldBe VectorStats.fromDVector(Seq(1))
+    VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0), Seq(3.0))) |+| VectorStats.Nil shouldBe VectorStats.fromDVectors(Seq(Seq(1.0), Seq(2.0), Seq(3.0)))
   }
 
   test("stats1 |+| stats2 = stats2 |+| stats1") {
@@ -51,7 +51,7 @@ class VectorStatsOpsSpec extends FunSuite with Matchers {
     val randomizer = new Random(7773)
     val testData: Seq[Vector] = (0 to 100).map(_ => Seq(randomizer.nextDouble() * 1000))
 
-    val statsComposed = testData.foldLeft(VectorStats.zeroDouble)((result, input) => result |+| input)
+    val statsComposed = testData.foldLeft(VectorStats.Nil)((result, input) => result |+| input)
     val statsFromDoubles = VectorStats.fromDVectors(testData)
 
     statsComposed.count shouldBe statsFromDoubles.count

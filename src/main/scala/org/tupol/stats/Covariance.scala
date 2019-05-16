@@ -66,7 +66,7 @@ object Covariance {
 
   def fromDoubles(x: Double, y: Double): Covariance = fromDoubles(Seq(x), Seq(y))
 
-  val zeroDouble: Covariance = Covariance(0, 0, Stats.zeroDouble, Stats.zeroDouble)
+  val Nil: Covariance = Covariance(0, 0, Stats.Nil, Stats.Nil)
 
   /**
    * Append a tuple to the current Covariance to obtain a new covariance
