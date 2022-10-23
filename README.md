@@ -79,9 +79,10 @@ The [`streaming-anomalies-demos`](https://github.com/tupol/streaming-anomalies-d
 
 ## References ##
 
-- [*"Formulas for Robust, One-Pass Parallel Computation of Covariances and Arbitrary-Order Statistical Moments"* by Philippe Pebay](http://prod.sandia.gov/techlib/access-control.cgi/2008/086212.pdf)
+- [*"Formulas for Robust, One-Pass Parallel Computation of Covariances and Arbitrary-Order Statistical Moments"* by Philippe Pebay](https://digital.library.unt.edu/ark:/67531/metadc837537/m1/7/?utm_source=email&utm_medium=client&utm_content=ark_sidebar&utm_campaign=ark_permanent)(http://prod.sandia.gov/techlib/access-control.cgi/2008/086212.pdf)
+- [*"Numerically stable, scalable formulas for parallel and online computation of higher-order multivariate central moments with arbitrary weights"* by Philippe Pebay, Timothy B. Terriberry, Hemanth Kolla, Janine Bennett4](https://zenodo.org/record/1232635/files/article.pdf)
 - [*"The Exponentially Weighted Moving Variance"* by J. F. Macgregor and T. J. Harris](https://www.tandfonline.com/doi/abs/10.1080/00224065.1993.11979433)
-- [*"Incremental calculation of weighted mean and variance"* by Tony Finch, February 2009](http://people.ds.cam.ac.uk/fanf2/hermes/doc/antiforgery/stats.pdf)
+- [*"Incremental calculation of weighted mean and variance"* by Tony Finch, February 2009](https://fanf2.user.srcf.net/hermes/doc/antiforgery/stats.pdf)
 - [Bessel Correction](https://en.wikipedia.org/wiki/Bessel%27s_correction)
 - [Skewness](https://en.wikipedia.org/wiki/Skewness)
 - [Kurtosis](https://en.wikipedia.org/wiki/Kurtosis)

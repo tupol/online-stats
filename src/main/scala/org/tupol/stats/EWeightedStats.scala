@@ -61,8 +61,8 @@ object EWeightedStats {
       val newMax = math.max(stats.max, x)
       val m1 = (1 - a) * stats.m1 + a * x
       val m2 = (1 - a) * (stats.m2 + a * (x - stats.m1) * (x - stats.m1))
-      val m3 = math.pow(m2, 3 / 2.0)
-      val m4 = m2 * m2
+      val m3 = math.pow(m2, 3 / 2.0) // TODO: FIX! HIGHLY LIKELY THIS IS INCORRECT
+      val m4 = m2 * m2 // TODO: FIX! HIGHLY LIKELY THIS IS INCORRECT
 
       EWeightedStats(stats.alpha, stats.count + 1, newMin, newMax, m1, m2, m3, m4)
     }
